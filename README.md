@@ -217,13 +217,14 @@ POST, PATCH, DELETEのテストについては、シェルスクリプトを書�
 
 アクセスするURL, 実行する回数, リクエストデータのJSONを指定する.
 
+アクセスするURLはgo run main.goしたとこの下に書いてある.
+
 ```
 [GIN-debug] GET  /thread    ......
 [GIN-debug] GET  /thread:id ......
 [GIN-debug] POST /thead     ......
 ......
 ```
-アクセスするURLはgo run main.goしたとこの下に書いてある.
 
 
 
