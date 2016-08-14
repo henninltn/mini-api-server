@@ -29,7 +29,7 @@ Go言語を書くための支援ツールのインストール.
 
 すでにインストールされていたgoを使う.
 
-goはコンパイラとパッケージマネージャ(パケージ管理ツール)の役割も果たしているので、以下のように簡単にパッケージをインストールできる.
+goはコンパイラとパッケージマネージャ(パケージ管理ツール)の役割も果たしているので, 以下のように簡単にパッケージをインストールできる.
 他に何ができるのか興味があるならシェルに```go help```とタイプしてみるといい.
 
 ```
@@ -54,7 +54,7 @@ $ go get -u -v golang.org/x/tools/cmd/gorename
 
 ついでにauto-completionとsyntax-checking入れとけばって書いてるので入れとく.
 
-それぞれ layers -> auto-completion、layers -> syntax-checking に詳しい説明がある.
+それぞれ layers -> auto-completion, layers -> syntax-checking に詳しい説明がある.
 
 同じく```~/.spacemacs```の```dotspacemacs-configuration-layers '( ... )```の中に以下を記述.
 ```
@@ -76,10 +76,30 @@ dotspacemacs-configuration-layers
 
 今回はMongoDBを使う.
 
-まずパケージの状態を最新にしてから、mongodbをインストールする.
+まずパケージの状態を最新にしてから, mongodbをインストールする.
 ```
 $ pacman -Syu
 $ pacman -S mongodb
+```
+
+ついでにこのプログラムが使用するデータベースとコレクションを作っておく。
+```
+$ mongo
+> show dbs
+test
+> use mini-api-server
+> show collections
+
+> db.createCollection('thread')
+> db.createCollection('respose')
+> show collections
+thread response
+> db.thread.find()
+
+> db.thread.insert({title: 'test'})
+> db.thread.find()
+{"id" : ObjectId("------------------------"), "title" : "test"}
+> exit
 ```
 
 
@@ -133,18 +153,21 @@ $ go get github.com/gin-gonic/gin
 $ systemctl start mongodb
 $ cd $GOPATH/src/gitlab.com/ユーザ名/mini-api-server
 $ go run main.go
+
+[GIN-debug] GET    /thread ......
+[GIN-debug] GET    /thread/:id ......
+......
 ```
-http://localhost:3000/ にアクセス
-取り敢えず以上のコマンドで動きます.
+http://localhost:8080/thread にブラウザからアクセス
 
 
 ### Detail
 
-1. MongoDBの起動
+#### MongoDBの起動
 
 まずは先ほどインストールしたMongoDBを起動する必要がある.
 
-Arch LinuxではMongoDBはサービスとして扱われるので、systemctlを使って起動、停止を行う.
+Arch LinuxではMongoDBはサービスとして扱われるので, systemctlを使って起動, 停止を行う.
 ```
 // 起動
 $ systemctl start mongodb
@@ -153,17 +176,17 @@ $ systemctl start mongodb
 $ systemctl stop mongodb
 ```
 
-2. Goでの実行
+#### Goでの実行
 
-MongoDBの起動後に、main.goのあるディレクトリで```go run main.go```と打てばいい.
+MongoDBの起動後に, main.goのあるディレクトリで```go run main.go```と打てばいい.
 
 ```
 $ cd $GOPATH/src/gitlab.com/ユーザ名/mini-api-server
 $ go run main.go
 ```
 
-ここまできて「あれ、Goってコンパイル言語じゃね？」って思った人.
-```go run```を使うとインタプリタ言語っぽくすぐに実行できるけど、ちゃんとコンパイルしてます.
+ここまできて「あれ, Goってコンパイル言語じゃね？」って思った人.
+```go run```を使うとインタプリタ言語っぽくすぐに実行できるけど, ちゃんとコンパイルしてます.
 
 もちろん```go build main.go```でコンパイルしてから生成された実行ファイルmainを実行してもいい.
 ```
@@ -174,12 +197,64 @@ README.md db handler main main.go
 $ ./main.go
 ```
 
-なお、実行ファイルを実行する時は、そのまま```main```と打つとシェルが```main```っていうコマンドと勘違いするので、カレントディレクトリ(現在のディレクトリ)を指す```.```を使って実行ファイルを指定する.
+なお, 実行ファイルを実行する時は, そのまま```main```と打つとシェルが```main```っていうコマンドと勘違いするので, カレントディレクトリ(現在のディレクトリ)を指す```.```を使って実行ファイルを指定する.
 
-3. ウェブブラウザでアクセス
-http://localhost:3000/
+#### ウェブブラウザでアクセス
+普通にブラウザにURL打てばGETになるので http://localhost:8080/thread にアクセス.
 
-実はこれ、ちょっと気持ち悪いけど、自分のコンピュータの一部(mini-api-serverディレクトリ以下)をサーバーとして、自分のコンピュータのみにアクセスを許可して公開している.
+さっきMongoDBで作成した```{"id":"------------------------",title":"test"}```が見える.
+
+実はこれ, ちょっと気持ち悪いけど, 自分のコンピュータの一部(mini-api-serverディレクトリ以下)をサーバーとして, 自分のコンピュータのみにアクセスを許可して公開している.
+
+ちなみにGETは検索, POSTは新規作成, PATCHは編集, DELETEは削除.
+
+POST, PATCH, DELETEのテストについては、シェルスクリプトを書いてtest_sh以下に置いておいた.
+
+アクセスするURL, 実行する回数, リクエストデータのJSONを指定する.
+
+```
+[GIN-debug] GET  /thread    ......
+[GIN-debug] GET  /thread:id ......
+[GIN-debug] POST /thead     ......
+......
+```
+アクセスするURLはgo run main.goしたとこの下に書いてある.
+
+
+
+##### POST(新規作成)
+```
+$ cd test_sh
+$ ./post_test http://localhost:8080/thread 1 '{"title":"post test"}'
+```
+このあとブラウザで http://localhost:8080/thread アクセス
+
+ちなみにidは自動生成される.
+
+
+##### PATCH(編集)
+idは http://localhost:8080/thread からどれかコピーしてきて.
+```
+$ ./patch_test http://localhost:8008/thread 1 '{"id":"------------------------","title":"update!"}'
+```
+またブラウザにアクセスして確認すると、idをコピーしたやつのtitleがupdate!になってるはず.
+
+
+##### DELETE(削除)
+```
+$ ./delete_test http://localhost:8080/thread 1 '{"id":"------------------------"}'
+```
+例によってidは適当にコピってくる.ブラウザで確認するとidコピったやつが消えてるはず.
+
+
+##### GET(検索)
+先にPOSTでいっぱい作っときます.
+
+そしてブラウザに http://localhost:8080/thread/------------------------ でアクセス.
+
+もちろん適当にidをコピる. idコピったやつだけ表示されるはず.
+
+つまり、/thread でアクセスすると全件検索で、/thead/:id でアクセスすると1件検索になる.
 
 
 ## Author
