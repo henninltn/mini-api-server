@@ -151,6 +151,7 @@ $ go get github.com/gin-gonic/gin
 1. MongoDBの起動
 2. Goで実行
 3. ウェブブラウザでアクセス
+
 ```
 $ systemctl start mongodb
 $ cd $GOPATH/src/gitlab.com/ユーザ名/mini-api-server
@@ -170,6 +171,7 @@ http://localhost:8080/thread にブラウザからアクセス
 まずは先ほどインストールしたMongoDBを起動する必要がある.
 
 Arch LinuxではMongoDBはサービスとして扱われるので, systemctlを使って起動, 停止を行う.
+
 ```
 // 起動
 $ systemctl start mongodb
@@ -191,6 +193,7 @@ $ go run main.go
 ```go run```を使うとインタプリタ言語っぽくすぐに実行できるけど, ちゃんとコンパイルしてます.
 
 もちろん```go build main.go```でコンパイルしてから生成された実行ファイルmainを実行してもいい.
+
 ```
 $ cd $GOPATH/src/gitlab.com/ユーザ名/mini-api-server
 $ go build main.go
@@ -225,6 +228,7 @@ POST, PATCH, DELETEのテストについては、シェルスクリプトを書�
 
 
 ##### POST(新規作成)
+
 ```
 $ cd test_sh
 $ ./post_test http://localhost:8080/thread 1 '{"title":"post test"}'
@@ -236,6 +240,7 @@ $ ./post_test http://localhost:8080/thread 1 '{"title":"post test"}'
 
 ##### PATCH(編集)
 idは http://localhost:8080/thread からどれかコピーしてきて.
+
 ```
 $ ./patch_test http://localhost:8008/thread 1 '{"id":"------------------------","title":"update!"}'
 ```
@@ -243,6 +248,7 @@ $ ./patch_test http://localhost:8008/thread 1 '{"id":"------------------------",
 
 
 ##### DELETE(削除)
+
 ```
 $ ./delete_test http://localhost:8080/thread 1 '{"id":"------------------------"}'
 ```
