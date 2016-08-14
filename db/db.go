@@ -4,12 +4,11 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
-func connect() (*mgo.Collection, *mgo.Session) {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("markdown").C("glossary")
-	return c, session
+func connect(collectionName string) (*mgo.Session, *mgo.Collection) {
+	// サーバにデータを保存するため、localhostという名前でセッションを作成
+	session, _ := mgo.Dial("localhost")
+
+	db := session.DB("mini-api-server")
+	collection := db.C(collectionName)
+	return session, collection
 }

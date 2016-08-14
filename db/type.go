@@ -2,32 +2,29 @@ package db
 
 import (
 	"errors"
-	"unicode/utf8"
+	"gopkg.in/mgo.v2/bson"
 )
 
-type Word struct {
-	Title    string `bson:"title"    json:"title"`
-	Contents string `bson:"contents" json:"contents"`
+// データベースのコレクションthreadのドキュメントに対応した構造体
+type Thread struct {
+	// bson はデータベースのコレクションのドキュメントに変換する際、される際に使用する
+	// json はJSONデータに変換する際、される際に使用する
+	ID    bson.ObjectId `bson:"_id"   json:"id"`
+	Title string        `bson:"title" json:"title"`
 }
 
-type User struct {
-	Id       string `bson:"id"       json:"id"`
-	Password string `bson:"password" json:"password"`
+type Response struct {
+	ID       bson.ObjectId `bson:"id"   json:"id"`
+	ThreadID bson.ObjectId `bson:"id"   json:"id"`
+	Name     string        `bson:"name" json:"name"`
+	Body     string        `bson:"body" json:"body"`
 }
 
-func (w *Word) isValid() error {
-	if w.Title == "" {
-		return errors.New("InvalidMemberError at Word.Title")
-	}
-	return nil
-}
-
-func (u *User) isValid() error {
-	if u.Id == "" {
-		return errors.New("InvalidMemberError at User.Id")
-	}
-	if utf8.RuneCountInString(u.Password) < 8 {
-		return errors.New("InvalidMemberError at User.Password")
+// 構造体のデータが仕様に沿っているか確認する
+func (thread *Thread) isValid() error {
+	// 仕様: タイトルはから文字ではない
+	if thread.Title == "" {
+		return errors.New("InvalidMemberError at Thread.Title")
 	}
 	return nil
 }

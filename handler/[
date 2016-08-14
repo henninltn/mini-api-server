@@ -1,0 +1,131 @@
+package handler
+
+import (
+	"../db"
+	"errors"
+	"github.com/gin-gonic/gin"
+	"gopkg.in/mgo.v2/bson"
+)
+
+// スレッドに関するリクエストを受け付けるパスを定義する
+func ThreadRoutes(router *gin.Engine) {
+	/* 下で定義されている、レスポンスとしてJSONを返す関数をそれぞれのリクエストパラメータに登録する */
+
+	router.GET("/thread", getAllThreads)
+
+	// /thread/ 以降をパラメータとして受け取れる
+	router.GET("/thread/:id", getThread)
+
+	router.POST("/thread", createThread)
+
+	router.PATCH("/thread", updateThread)
+
+	router.DELETE("/thread", deleteThread)
+}
+
+// データベースのコレクションthreadから全てのドキュメントを取得してJSONに変換したものをレスポンスとして返す
+func getAllThreads(context *gin.Context) {
+	var threadMapper db.ThreadMapper
+	// 接続したデータベースのコレクションから全てのドキュメントを取得してThread型の構造体に変換(全て取得しているのでスライスになっている)
+	responseThreads, error := threadMapper.FindAll()
+	if error != nil {
+		// handler/type.go で定義されている関数
+		// status code: 404 Not Found
+		context.JSON(404, GetErrorMessage(error))
+		return
+	}
+	// 取得した構造体をJSONに変換してレスポンスする
+	// status code: 200 OK
+	context.JSON(200, responseThreads)
+}
+
+/* データベースのコレクションthreadからリクエストパスで指定されたidに一致するドキュメントを取得してJSONに変換したものをレスポンスとして返す */
+func getThread(context *gin.Context) {
+	// リクエストパスからパラメータ取得
+	stringId := context.Param("id")
+
+	// 文字列のidがデータベースのObjectIdに変換できるか確認して変換
+	if !bson.IsObjectIdHex(stringId) {
+		// status coede: 400 Bad Request
+		context.JSON(400, errors.New("Invalid id"))
+		return
+	}
+	id := bson.ObjectIdHex(stringId)
+
+	var threadMapper db.ThreadMapper
+	// 接続したデータベースのコレクションからidが一致するドキュメントを取得してThread型の構造体に変換
+	responseThread, error := threadMapper.Find(id)
+	if error != nil {
+		// status code: 404 Not Found
+		context.JSON(404, GetErrorMessage(error))
+		return
+	}
+	// status code: 200 OK
+	context.JSON(200, responseThread)
+}
+
+/* リクエストのJSONを変換してデータベースに追加する */
+func createThread(context *gin.Context) {
+	// POSTされたリクエストデータのJSONを取得してThread型の構造体に変換
+	requestThread := new(db.Thread)
+	if error := context.BindJSON(requestThread); error != nil {
+		// JSONのバインドに失敗 -> JSONのデータ形式が間違っている
+		// status code: 400 Bad Request
+		context.JSON(400, GetErrorMessage(error))
+		return
+	}
+	// IDを生成(リクエストデータにIDは含まれない)
+	requestThread.ID = bson.NewObjectId()
+
+	var threadMapper db.ThreadMapper
+	// 構造体をデータベースに追加する
+	error := threadMapper.Insert(requestThread)
+	if error != nil {
+		// ThreadMapper.Insertに失敗 -> isValidで失敗したか、DBのInsertに失敗したか
+		// どちらにしろJSONのデータ形式が間違っている
+		// status code: 400 Bad Request
+		context.JSON(400, GetErrorMessage(error))
+		return
+	}
+	// Created
+	context.Status(201)
+}
+
+/* データベースのコレクションthreadからリクエストパスで指定されたidに一致するドキュメントを取得して、そのデータをリクエストデータのJSONの内容で更新する */
+func updateThread(context *gin.Context) {
+	requestThread := new(db.Thread)
+	if error := context.BindJSON(requestThread); error != nil {
+		// Bad Request
+		// JSONのバインドに失敗 -> JSONのデータ形式が間違っている
+		context.JSON(400, GetErrorMessage(error))
+		return
+	}
+
+	var threadMapper db.ThreadMapper
+	error := threadMapper.Update(requestThread)
+	if error != nil {
+		// Bad Request
+		// Updateに失敗 -> isValidで失敗したか、DBのInsertに失敗したか
+		// どちらにしろJSONのデータ形式が間違っている
+		context.JSON(400, GetErrorMessage(error))
+		return
+	}
+	// OK
+	// 成功すればリクエストされたJSONをそのまま返す
+	context.JSON(200, requestThread)
+}
+
+func deleteThread(context *gin.Context) {
+	requestThread := new(db.Thread)
+	if error := context.BindJSON(requestThread); error != nil {
+		// JSONのバインドに失敗 -> JSONのデータ形式が間違っている
+		// status code: 400 Bad Request
+		context.JSON(400, GetErrorMessage(error))
+		return
+	}
+
+	var threadMapper db.ThreadMapper
+	threadMapper.Delete(requestThread)
+	// status code: 204 No Content
+	context.Status(204)
+}

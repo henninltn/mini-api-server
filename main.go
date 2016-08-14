@@ -3,17 +3,12 @@ package main
 import (
 	"./handler"
 	"github.com/gin-gonic/gin"
-	"os"
 )
 
 func main() {
-	r := gin.Default()
+	router := gin.Default()
 
-	handler.WordRoutes(r)
+	handler.ThreadRoutes(router)
 
-	port := os.Getenv("PORT")
-	if len(port) == 0 {
-		port = "3000"
-	}
-	r.Run(":" + port)
+	router.Run(":8080")
 }
