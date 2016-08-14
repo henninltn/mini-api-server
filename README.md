@@ -94,9 +94,11 @@ test
 > db.createCollection('respose')
 > show collections
 thread response
+> show dbs
+test mini-api-server
 > db.thread.find()
 
-> db.thread.insert({title: 'test'})
+> db.thread.insert({"title":"test"})
 > db.thread.find()
 {"id" : ObjectId("------------------------"), "title" : "test"}
 > exit
