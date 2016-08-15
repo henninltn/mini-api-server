@@ -42,7 +42,7 @@ func (_ *ThreadMapper) Update(thread *Thread) error {
 	return error
 }
 
-// データベースのコレクションthreadから引数のThread型の構造体のidに一致するドキュメントをを削除する
+// データベースのコレクションthreadから引数のThread型の構造体のidに一致するドキュメントを削除する
 func (_ *ThreadMapper) Delete(thread *Thread) error {
 	// セッションの開始とデータベースのコレクションthreadへの接続
 	session, collection := connect("thread")
@@ -77,8 +77,8 @@ func (_ *ThreadMapper) FindAll() (*[]Thread, error) {
 	// セッションを閉じる
 	defer session.Close()
 
-	// 接続したコレクションのドキュメントを全て取得して、Thread型の構造体に変換して、全体をスライスとして変数に代入する
-	response := new([]Thread)
-	error := collection.Find(nil).All(response)
-	return response, error
+	// 接続したコレクションのドキュメントを全て取得して、Thread型の構造体に変換して、全体をスライス(のポインタ)として変数に代入する
+	responseThreads := new([]Thread)
+	error := collection.Find(nil).All(responseThreads)
+	return responseThreads, error
 }

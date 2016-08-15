@@ -30,7 +30,7 @@ func getAllThreads(context *gin.Context) {
 	// db/thread.go に定義されている
 	responseThreads, error := threadMapper.FindAll()
 	if error != nil {
-		// ThreadMapper.FindAllに失敗 -> コレクションthreadにはドキュメントが１つも存在しない
+		// ThreadMapper.FindAllに失敗 ->
 		// handler/type.go で定義されている関数
 		// status code: 404 Not Found
 		context.JSON(404, GetErrorMessage(error))
@@ -53,12 +53,12 @@ func getThread(context *gin.Context) {
 		context.JSON(400, errors.New("Invalid id"))
 		return
 	}
-	id := bson.ObjectIdHex(stringId)
+	objectId := bson.ObjectIdHex(stringId)
 
 	var threadMapper db.ThreadMapper
 	// 接続したデータベースのコレクションからidが一致するドキュメントを取得してThread型の構造体に変換
 	// db/thread.go に定義されている
-	responseThread, error := threadMapper.Find(id)
+	responseThread, error := threadMapper.Find(objectId)
 	if error != nil {
 		// ThreadMapper.Findに失敗 -> コレクションthreadには指定されたidのドキュメントがない
 		// status code: 404 Not Found
@@ -71,7 +71,7 @@ func getThread(context *gin.Context) {
 	context.JSON(200, responseThread)
 }
 
-// リクエストのJSONデータを変換してデータベースに追加する
+// リクエストのJSONデータを変換してコレクションに追加する
 func createThread(context *gin.Context) {
 	// リクエストのJSONデータを取得してThread型の構造体に変換
 	requestThread := new(db.Thread)
@@ -85,7 +85,7 @@ func createThread(context *gin.Context) {
 	requestThread.ID = bson.NewObjectId()
 
 	var threadMapper db.ThreadMapper
-	// 構造体をドキュメントに変換してデータベースに追加する
+	// 構造体をドキュメントに変換してコレクションに追加する
 	error := threadMapper.Insert(requestThread)
 	if error != nil {
 		// ThreadMapper.Insertに失敗 -> isValidで失敗したか、DBのInsertに失敗したか
@@ -143,7 +143,7 @@ func deleteThread(context *gin.Context) {
 	error := threadMapper.Delete(requestThread)
 	if error != nil {
 		// ThreadMapper.Deleteに失敗 -> DBのInsertに失敗 -> 構造体のidに一致するドキュメントがコレクションthreadにない
-		// status code: 404 not found
+		// status code: 404 Not Found
 		context.JSON(404, GetErrorMessage(error))
 		return
 	}
