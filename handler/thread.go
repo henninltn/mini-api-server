@@ -11,16 +11,16 @@ import (
 func ThreadRoutes(router *gin.Engine) {
 	/* 下で定義されている、レスポンスとしてJSONを返す関数をそれぞれのリクエストパラメータに登録する */
 
-	router.GET("/thread", getAllThreads)
+	router.GET("/threads", getAllThreads)
 
 	// /thread/ 以降をパラメータとして受け取れる
-	router.GET("/thread/:id", getThread)
+	router.GET("/threads/:id", getThread)
 
-	router.POST("/thread", createThread)
+	router.POST("/threads", createThread)
 
-	router.PATCH("/thread", updateThread)
+	router.PATCH("/threads", updateThread)
 
-	router.DELETE("/thread", deleteThread)
+	router.DELETE("/threads", deleteThread)
 }
 
 // データベースのコレクションthreadから全てのドキュメントを取得してJSONに変換したものをレスポンスとして返す

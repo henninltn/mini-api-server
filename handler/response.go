@@ -8,13 +8,13 @@ import (
 )
 
 func ResponseRoutes(router *gin.Engine) {
-	router.GET("/response/:id", getAllResponse)
+	router.GET("/responses/:id", getAllResponse)
 
-	router.POST("/response", makeResponse)
+	router.POST("/responses", makeResponse)
 
-	router.PATCH("/response", updateResponse)
+	router.PATCH("/responses", updateResponse)
 
-	router.DELETE("/response", deleteResponse)
+	router.DELETE("/responses", deleteResponse)
 }
 
 // リクエストパラメータのidに一致するthread_idを持つドキュメントを全て取得して、JSONに変換してレスポンスする
