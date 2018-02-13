@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"../db"
+	"mini-api-server/db"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2/bson"

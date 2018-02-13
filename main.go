@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./handler"
+	"mini-api-server/handler"
 	"github.com/gin-gonic/gin"
 )
 
